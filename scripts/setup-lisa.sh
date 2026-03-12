@@ -270,6 +270,40 @@ $CONTEXT_CONTENT
 CONTEXT_EOF
 fi
 
+# Detect GSD research in context — inject interview guidance outside code fence
+# so Lisa treats it as active instructions, not passive text.
+# Backwards-compatible: only activates when GSD research markers are present.
+if [[ -n "$CONTEXT_CONTENT" ]] && echo "$CONTEXT_CONTENT" | grep -q "GSD Research Context"; then
+  cat >> "$PROMPT_FILE" << 'GSD_EOF'
+
+## GSD RESEARCH DETECTED — INTERVIEW ADAPTATION
+
+The provided context contains GSD (Get Shit Done) research output. Adapt your interview:
+
+### SKIP these questions (GSD already answered them):
+- Generic tech stack questions ("What technology?") — GSD's Stack Research covers this
+- Generic architecture questions ("How should it be structured?") — GSD's Architecture Research covers this
+- Generic "what features?" discovery — GSD's Feature Research catalogs table stakes and differentiators
+
+### PROBE these instead (GSD research is broad but shallow on requirements):
+- **Acceptance criteria**: "GSD identified [feature] — what specific behavior proves it works?"
+- **Edge cases**: "What happens when [feature] encounters [failure mode]?"
+- **Version/constraint specifics**: "GSD recommends [tech] — any version constraints or deployment limits?"
+- **Pitfall handling**: "GSD flagged [pitfall] — what's the user-facing behavior when this happens?"
+- **Verification commands**: "What command proves [requirement] is working?"
+
+### CONVERT GSD features to structured user stories:
+For each GSD-identified feature, ask the user for acceptance criteria, then format as:
+- US-X: As a [user], I want [feature] so that [value]. Acceptance: [testable criteria]
+- Do NOT generate placeholder stories — every story needs REAL criteria from the user
+
+### If GSD REQUIREMENTS.md is included:
+Don't accept as-is. Probe: "How should the system behave if [edge case]?" and
+"How do we verify [requirement] is working?" even if the requirement is already listed.
+
+GSD_EOF
+fi
+
 # Add session info
 cat >> "$PROMPT_FILE" << SESSION_EOF
 
