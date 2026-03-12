@@ -272,11 +272,17 @@ fi
 
 # Detect GSD research in context — inject interview guidance outside code fence
 # so Lisa treats it as active instructions, not passive text.
-# Backwards-compatible: only activates when GSD research markers are present.
-if [[ -n "$CONTEXT_CONTENT" ]] && echo "$CONTEXT_CONTENT" | grep -q "GSD Research Context"; then
+# Backwards-compatible: only activates when the exact gsd-to-lisa.sh marker is present.
+# Anchored grep "^## GSD Research Context" prevents false positives on docs that
+# casually mention GSD.
+if [[ -n "$CONTEXT_CONTENT" ]] && echo "$CONTEXT_CONTENT" | grep -q "^## GSD Research Context"; then
   cat >> "$PROMPT_FILE" << 'GSD_EOF'
 
 ## GSD RESEARCH DETECTED — INTERVIEW ADAPTATION
+
+**If first-principles mode is also active:** Run first-principles challenges FIRST (validate
+the approach), THEN apply GSD adaptation for the detailed spec gathering phase. GSD research
+informs the "what to build" — first-principles validates "should we build it."
 
 The provided context contains GSD (Get Shit Done) research output. Adapt your interview:
 
